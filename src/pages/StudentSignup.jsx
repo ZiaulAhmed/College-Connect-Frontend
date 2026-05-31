@@ -21,15 +21,47 @@ export default function StudentSignup() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // Allow only alphabets and spaces for name
+    if (name === "name" && /[^a-zA-Z\s]/.test(value)) {
+      return;
+    }
+
+    // Allow only numbers and restrict to 10 digits for contact
+    if (name === "contact") {
+      const onlyNums = value.replace(/\D/g, "");
+      if (onlyNums.length > 10) return;
+      setFormData((prev) => ({ ...prev, [name]: onlyNums }));
+      return;
+    }
+
+    // Prevent spaces and auto-lowercase for email
+    if (name === "email") {
+      setFormData((prev) => ({ ...prev, [name]: value.replace(/\s/g, "").toLowerCase() }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (formData.contact.length !== 10) {
+      setError("Contact number must be exactly 10 digits");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
 
     // ✅ Password match validation
     if (formData.password !== formData.confirmPassword) {
@@ -85,6 +117,7 @@ export default function StudentSignup() {
             <label>
               Full Name
               <input
+                type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
@@ -106,10 +139,14 @@ export default function StudentSignup() {
             <label>
               Contact Number
               <input
+                type="tel"
                 name="contact"
                 value={formData.contact}
                 onChange={handleChange}
                 required
+                maxLength="10"
+                pattern="[0-9]{10}"
+                title="Please enter exactly 10 digits"
               />
             </label>
 

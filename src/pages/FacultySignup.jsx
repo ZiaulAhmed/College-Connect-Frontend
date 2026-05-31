@@ -26,9 +26,40 @@ export default function FacultySignup() {
   const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "name" && /[^a-zA-Z\s]/.test(value)) {
+      return;
+    }
+
+    if (name === "contact") {
+      const onlyNums = value.replace(/\D/g, "");
+      if (onlyNums.length > 10) return;
+      setFormData((prev) => ({ ...prev, [name]: onlyNums }));
+      return;
+    }
+
+    if (name === "email") {
+      setFormData((prev) => ({ ...prev, [name]: value.replace(/\s/g, "").toLowerCase() }));
+      return;
+    }
+
+    if (name === "aadharId") {
+      const onlyNums = value.replace(/\D/g, "");
+      if (onlyNums.length > 12) return;
+      setFormData((prev) => ({ ...prev, [name]: onlyNums }));
+      return;
+    }
+
+    if (name === "bankAccount") {
+      const onlyNums = value.replace(/\D/g, "");
+      setFormData((prev) => ({ ...prev, [name]: onlyNums }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: value,
     }));
   };
 
@@ -36,6 +67,19 @@ export default function FacultySignup() {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    if (formData.contact.length !== 10) {
+      return setError("Contact number must be exactly 10 digits");
+    }
+
+    if (formData.aadharId.length !== 12) {
+      return setError("Aadhaar number must be exactly 12 digits");
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      return setError("Please enter a valid email address");
+    }
 
     if (formData.password !== formData.confirmPassword) {
       return setError("Passwords do not match");
@@ -125,11 +169,15 @@ export default function FacultySignup() {
               </select>
             </div>
             <input
+              type="tel"
               name="contact"
               placeholder="Contact Number"
               value={formData.contact}
               onChange={handleChange}
               required
+              maxLength="10"
+              pattern="[0-9]{10}"
+              title="Please enter exactly 10 digits"
             />
 
             {/* Group 2: IDs */}
