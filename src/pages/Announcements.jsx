@@ -1,10 +1,14 @@
 // src/pages/Announcements.jsx
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   fetchAnnouncements,
   deleteAnnouncement,
   updateAnnouncement,
 } from "../services/announcementService";
+
+
+
 import { getCurrentUser } from "../services/authService";
 
 const STORAGE_KEY = "cc_approved_announcement_ids";
@@ -24,50 +28,98 @@ export default function Announcements() {
   const isAdmin = currentRole === "admin";
   const isFaculty = currentRole === "faculty";
 
-  const parseList = (raw) => {
-    console.log("Announcements raw response:", raw);
-    let list = [];
+  // const parseList = (raw) => {
+  //   console.log("Announcements raw response:", raw);
+  //   let list = [];
 
-    if (Array.isArray(raw)) list = raw;
-    else if (Array.isArray(raw?.data)) list = raw.data;
-    else if (Array.isArray(raw?.announcements)) list = raw.announcements;
-    else if (Array.isArray(raw?.data?.announcements))
-      list = raw.data.announcements;
-    else if (Array.isArray(raw?.items)) list = raw.items;
+  //   if (Array.isArray(raw)) list = raw;
+  //   else if (Array.isArray(raw?.data)) list = raw.data;
+  //   else if (Array.isArray(raw?.announcements)) list = raw.announcements;
+  //   else if (Array.isArray(raw?.data?.announcements))
+  //     list = raw.data.announcements;
+  //   else if (Array.isArray(raw?.items)) list = raw.items;
 
-    return list;
-  };
+  //   return list;
+  // };
 
-  const load = async () => {
-    setLoading(true);
-    setError("");
+  // const load = async () => {
+  //   setLoading(true);
+  //   setError("");
+
+  //   try {
+  //     const raw = await fetchAnnouncements();
+  //     const list = parseList(raw);
+
+  //     // Load approved IDs from localStorage
+  //     let storedIds = [];
+  //     try {
+  //       const stored = window.localStorage.getItem(STORAGE_KEY);
+  //       storedIds = stored ? JSON.parse(stored) : [];
+  //     } catch {
+  //       storedIds = [];
+  //     }
+
+  //     setAllAnnouncements(list);
+  //     setApprovedIds(storedIds);
+  //   } catch (err) {
+  //     console.error("Error loading announcements:", err?.response || err);
+  //     setError("Failed to load announcements. Please try again later.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   load();
+  // }, []);
+
+
+  const parseList = useCallback((raw) => {
+  console.log("Announcements raw response:", raw);
+
+  let list = [];
+
+  if (Array.isArray(raw)) list = raw;
+  else if (Array.isArray(raw?.data)) list = raw.data;
+  else if (Array.isArray(raw?.announcements)) list = raw.announcements;
+  else if (Array.isArray(raw?.data?.announcements))
+    list = raw.data.announcements;
+  else if (Array.isArray(raw?.items)) list = raw.items;
+
+  return list;
+}, []);
+
+const load = useCallback(async () => {
+  setLoading(true);
+  setError("");
+
+  try {
+    const raw = await fetchAnnouncements();
+    const list = parseList(raw);
+
+    let storedIds = [];
 
     try {
-      const raw = await fetchAnnouncements();
-      const list = parseList(raw);
-
-      // Load approved IDs from localStorage
-      let storedIds = [];
-      try {
-        const stored = window.localStorage.getItem(STORAGE_KEY);
-        storedIds = stored ? JSON.parse(stored) : [];
-      } catch {
-        storedIds = [];
-      }
-
-      setAllAnnouncements(list);
-      setApprovedIds(storedIds);
-    } catch (err) {
-      console.error("Error loading announcements:", err?.response || err);
-      setError("Failed to load announcements. Please try again later.");
-    } finally {
-      setLoading(false);
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      storedIds = stored ? JSON.parse(stored) : [];
+    } catch {
+      storedIds = [];
     }
-  };
 
-  useEffect(() => {
-    load();
-  }, []);
+    setAllAnnouncements(list);
+    setApprovedIds(storedIds);
+  } catch (err) {
+    console.error("Error loading announcements:", err?.response || err);
+    setError("Failed to load announcements. Please try again later.");
+  } finally {
+    setLoading(false);
+  }
+}, [parseList]);
+
+useEffect(() => {
+  load();
+}, [load]);
+
 
   const updateApprovedIds = (newIds) => {
     setApprovedIds(newIds);
