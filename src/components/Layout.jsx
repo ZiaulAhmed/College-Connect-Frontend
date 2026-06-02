@@ -9,7 +9,7 @@ export default function Layout({ children }) {
     <div className="app-shell">
       <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
       <div className={`app-body ${sidebarOpen ? "sidebar-open" : ""}`}>
-        <Sidebar />
+        <Sidebar closeSidebar={() => setSidebarOpen(false)} />
         <main className="app-main">
           <div className="app-main-inner">{children}</div>
         </main>

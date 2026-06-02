@@ -3,7 +3,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { getCurrentUser } from "../services/authService";
 
-export default function Sidebar() {
+export default function Sidebar({ closeSidebar }) {
   const location = useLocation();
   const user = getCurrentUser();
   const role = user?.role;
@@ -13,9 +13,25 @@ export default function Sidebar() {
   const linkClass = (path) =>
     "sidebar-link" + (isActive(path) ? " sidebar-link-active" : "");
 
+  const handleSidebarClick = (e) => {
+    // Only trigger if a link (or element inside a link) was clicked
+    if (e.target.closest('a')) {
+      if (closeSidebar) closeSidebar();
+      
+      // Delay slightly to ensure React Router has updated the DOM
+      setTimeout(() => {
+        const mainArea = document.querySelector(".app-main");
+        if (mainArea) {
+          mainArea.scrollTo({ top: 0, behavior: 'instant' });
+        }
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }, 50);
+    }
+  };
+
   return (
     <aside className="app-sidebar">
-      <div className="sidebar-inner">
+      <div className="sidebar-inner" onClick={handleSidebarClick}>
 
         {/* ================= MAIN ================= */}
         <div className="sidebar-section-label">Main</div>
