@@ -226,7 +226,7 @@ a {
   top: calc(100% + 12px);
   right: 0;
   width: 320px;
-  z-index: 50;
+  z-index: 100;
   animation: slideDown 0.2s ease-out;
 }
 
@@ -243,6 +243,11 @@ a {
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translate(-50%, -45%) scale(0.95); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 /* Body: sidebar + content */
@@ -1018,6 +1023,23 @@ input:focus, select:focus, textarea:focus {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .profile-dropdown-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    right: auto;
+    padding: 20px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+    animation: popIn 0.2s ease-out forwards;
+  }
+
+  .profile-dropdown-card .id-details p {
+    font-size: 13px;
+    margin: 4px 0;
   }
 
   .app-main {
