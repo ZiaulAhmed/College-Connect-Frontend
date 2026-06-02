@@ -1,6 +1,6 @@
 // src/pages/Events.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 
 export default function Events() {
   const [events, setEvents] = useState([]);
@@ -12,7 +12,7 @@ export default function Events() {
       try {
         setLoading(true);
         setError("");
-        const res = await axios.get("http://localhost:5000/api/events");
+        const res = await api.get("/api/events");
         const data = res.data;
         setEvents(Array.isArray(data) ? data : []);
       } catch (err) {
