@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000", // use local backend for testing
+  baseURL: "https://college-connect-backend-pearl.vercel.app/", // keep as per your backend
 });
 
 // Attach token from localStorage
